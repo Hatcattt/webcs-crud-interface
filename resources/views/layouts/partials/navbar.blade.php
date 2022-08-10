@@ -1,6 +1,6 @@
 <nav class="container-fluid navi">
     <ul>
-        <li><a href="./" class="contrast" onclick="event.preventDefault()"><strong>Crud Project Interface</strong></a></li>
+        <li><a href="./" class="contrast" onclick="event.preventDefault()"><strong>Crud Project</strong></a></li>
     </ul>
     <ul>
         <li>
@@ -13,20 +13,18 @@
                 </ul>
             </details>
         </li>
-{{--        <li>--}}
-{{--            <details role="list" dir="rtl">--}}
-{{--                <summary aria-haspopup="listbox" role="link" class="contrast">Examples</summary>--}}
-{{--                <ul role="listbox">--}}
-{{--                    <li><a href="../preview/">Preview</a></li>--}}
-{{--                    <li><a href="../preview-rtl/">Right-to-left</a></li>--}}
-{{--                    <li><a href="../classless/">Class-less</a></li>--}}
-{{--                    <li><a href="../basic-template/">Basic template</a></li>--}}
-{{--                    <li><a href="../company/">Company</a></li>--}}
-{{--                    <li><a href="../google-amp/">Google Amp</a></li>--}}
-{{--                    <li><a href="../sign-in/">Sign in</a></li>--}}
-{{--                    <li><a href="../bootstrap-grid/">Bootstrap grid</a></li>--}}
-{{--                </ul>--}}
-{{--            </details>--}}
-{{--        </li>--}}
+        @auth
+            {{auth()->user()->name}}
+            <li>
+                <a href="{{ route('logout.perform') }}" role="button">Logout</a>
+            </li>
+        @endauth
+
+        @guest
+            <li>
+                <a href="{{ route('login.perform') }}" role="button">Login</a>
+                <a href="{{ route('register.perform') }}" role="button">Sign-up</a>
+            </li>
+        @endguest
     </ul>
 </nav>

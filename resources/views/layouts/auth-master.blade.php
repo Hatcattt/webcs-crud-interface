@@ -18,6 +18,7 @@
 </head>
 <body>
 <main>
+    @include('layouts.partials.navbar')
     @yield('content')
 </main>
 
