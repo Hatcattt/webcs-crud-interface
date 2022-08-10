@@ -1,0 +1,15 @@
+/** {*/
+/*    border: 1px indianred solid;*/
+/*}*/
+
+body {
+    font-family: 'Nunito', sans-serif;
+}
+
+/*:root {*/
+/*    --primary: #7cb342;*/
+/*}*/
+
+.navi {
+    box-shadow: #2d3748 0px 5px 20px;
+}
