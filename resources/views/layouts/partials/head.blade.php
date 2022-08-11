@@ -9,7 +9,5 @@
 
     <link href="{{ asset('css/main.css') }}" rel="stylesheet">
     <link href="{{ asset('css/pico.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('font-awesome/css/all.css') }}">
-
-    @yield('head+')
+    <link href="{{ asset('font-awesome/css/all.css') }}" rel="stylesheet" >
 </head>
