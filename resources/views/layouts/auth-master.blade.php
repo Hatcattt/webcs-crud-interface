@@ -9,8 +9,9 @@
     @yield('content')
 </main>
 
+@include('layouts.partials.footer')
+
 <!-- Minimal theme switcher : pico-css -->
 <script src="{{ asset('js/minimal-theme-switcher.js') }}"></script>
-
 </body>
 </html>
