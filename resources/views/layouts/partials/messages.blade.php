@@ -1,26 +1,24 @@
 @if(isset ($errors) && count($errors) > 0)
-    <div class="alert alert-warning" role="alert">
-        <ul class="list-unstyled mb-0">
+    <div>
+        <ul class="bloc-error">
             @foreach($errors->all() as $error)
-                <li>{{ $error }}</li>
+                <li class="msg-error">{{ $error }}</li>
             @endforeach
         </ul>
     </div>
 @endif
 
-@if(Session::get('success', false))
-    <?php $data = Session::get('success'); ?>
-    @if (is_array($data))
-        @foreach ($data as $msg)
-            <div class="alert alert-warning" role="alert">
-                <i class="fa fa-check"></i>
-                {{ $msg }}
-            </div>
-        @endforeach
-    @else
-        <div class="alert alert-warning" role="alert">
-            <i class="fa fa-check"></i>
-            {{ $data }}
-        </div>
-    @endif
-@endif
+{{--@if(Session::get('success', false))--}}
+{{--    <?php $data = Session::get('success'); ?>--}}
+{{--    @if (is_array($data))--}}
+{{--        @foreach ($data as $msg)--}}
+{{--            <div>--}}
+{{--                {{ $msg }}--}}
+{{--            </div>--}}
+{{--        @endforeach--}}
+{{--    @else--}}
+{{--        <div>--}}
+{{--            {{ $data }}--}}
+{{--        </div>--}}
+{{--    @endif--}}
+{{--@endif--}}

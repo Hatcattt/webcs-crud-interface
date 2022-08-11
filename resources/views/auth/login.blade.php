@@ -1,33 +1,32 @@
 @extends('layouts.auth-master')
 
 @section('content')
-    <form method="post" action="{{ route('login.perform') }}">
+    <article class="grid">
+        <div>
+            <hgroup>
+                <h1>@lang('Log In')</h1>
+                <h2>@lang('Continue to your crud interface')</h2>
+            </hgroup>
 
-        <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-        <img class="mb-4" src="{!! url('images/bootstrap-logo.svg') !!}" alt="" width="72" height="57">
+            <form method="POST" action="{{ route('login.perform') }}">
+                @csrf
 
-        <h1 class="h3 mb-3 fw-normal">Login</h1>
+                @include('layouts.partials.messages')
+                <input type="email" name="email" value="{{ old('email') }}" placeholder="@lang('Email')" required="required" autofocus>
+                <input type="password" name="password" placeholder="Password" aria-label="Password" autocomplete="current-password" required>
 
-        @include('layouts.partials.messages')
+                <fieldset>
+                    <label for="remember">
+                        <input type="checkbox" role="switch" id="remember" name="remember">
+                        Remember me
+                    </label>
+                </fieldset>
 
-        <div class="form-group form-floating mb-3">
-            <input type="text" class="form-control" name="username" value="{{ old('username') }}" placeholder="Username" required="required" autofocus>
-            <label for="floatingName">Email or Username</label>
-            @if ($errors->has('username'))
-                <span class="text-danger text-left">{{ $errors->first('username') }}</span>
-            @endif
+                <button type="submit" class="contrast">@lang('Login')</button>
+            </form>
         </div>
-
-        <div class="form-group form-floating mb-3">
-            <input type="password" class="form-control" name="password" value="{{ old('password') }}" placeholder="Password" required="required">
-            <label for="floatingPassword">Password</label>
-            @if ($errors->has('password'))
-                <span class="text-danger text-left">{{ $errors->first('password') }}</span>
-            @endif
+        <div style="margin: auto">
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab, aliquam debitis deserunt dolorum enim et eum exercitationem facere labore nostrum numquam officiis omnis placeat quo quod temporibus tenetur vel voluptate?</p>
         </div>
-
-        <button class="w-100 btn btn-lg btn-primary" type="submit">Login</button>
-
-{{--        @include('auth.partials.copy')--}}
-    </form>
+    </article>
 @endsection

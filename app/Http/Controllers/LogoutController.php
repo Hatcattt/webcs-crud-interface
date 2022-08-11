@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
@@ -11,7 +12,7 @@ class LogoutController extends Controller
     /**
      * Log out account user.
      *
-     * @return \Illuminate\Routing\Redirector
+     * @return Redirector
      */
     public function perform()
     {

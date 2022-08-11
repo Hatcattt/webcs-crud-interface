@@ -1,46 +1,35 @@
 @extends('layouts.auth-master')
 
 @section('content')
-    <form method="post" action="{{ route('register.perform') }}">
+    <article class="grid">
+        <div>
+            <hgroup>
+                <h1>@lang('Register')</h1>
+                <h2>@lang('Complete this to proceed to the next step')</h2>
+            </hgroup>
+            <form method="POST" action="{{ route('register.perform') }}">
+                @csrf
 
-        <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-        <img class="mb-4" src="{!! url('images/bootstrap-logo.svg') !!}" alt="" width="72" height="57">
+                @include('layouts.partials.messages')
+                <div>
+                    <label for="email">@lang('Email Address')</label>
+                    <input type="email" name="email" value="{{ old('email') }}" placeholder="name@example.com" required="required" autofocus>
+                </div>
+                <div>
+                    <label for="username">@lang('Username')</label>
+                    <input type="text" name="username" value="{{ old('username') }}" placeholder="Username" required="required" autofocus>
+                </div>
+                <div>
+                    <label for="password">@lang('Password')</label>
+                    <input type="password" name="password" value="{{ old('password') }}" placeholder="Password" required="required">
+                </div>
+                <div>
+                    <label for="password_confirmation">@lang('Confirm Password')</label>
+                    <input type="password" name="password_confirmation" value="{{ old('password_confirmation') }}" placeholder="Confirm Password" required="required">
+                </div>
 
-        <h1 class="h3 mb-3 fw-normal">Register</h1>
-
-        <div class="form-group form-floating mb-3">
-            <input type="email" class="form-control" name="email" value="{{ old('email') }}" placeholder="name@example.com" required="required" autofocus>
-            <label for="floatingEmail">Email address</label>
-            @if ($errors->has('email'))
-                <span class="text-danger text-left">{{ $errors->first('email') }}</span>
-            @endif
+                <button class="contrast" type="submit">@lang('Register')</button>
+            </form>
         </div>
-
-        <div class="form-group form-floating mb-3">
-            <input type="text" class="form-control" name="username" value="{{ old('username') }}" placeholder="Username" required="required" autofocus>
-            <label for="floatingName">Username</label>
-            @if ($errors->has('username'))
-                <span class="text-danger text-left">{{ $errors->first('username') }}</span>
-            @endif
-        </div>
-
-        <div class="form-group form-floating mb-3">
-            <input type="password" class="form-control" name="password" value="{{ old('password') }}" placeholder="Password" required="required">
-            <label for="floatingPassword">Password</label>
-            @if ($errors->has('password'))
-                <span class="text-danger text-left">{{ $errors->first('password') }}</span>
-            @endif
-        </div>
-
-        <div class="form-group form-floating mb-3">
-            <input type="password" class="form-control" name="password_confirmation" value="{{ old('password_confirmation') }}" placeholder="Confirm Password" required="required">
-            <label for="floatingConfirmPassword">Confirm Password</label>
-            @if ($errors->has('password_confirmation'))
-                <span class="text-danger text-left">{{ $errors->first('password_confirmation') }}</span>
-            @endif
-        </div>
-
-        <button class="w-100 btn btn-lg btn-primary" type="submit">Register</button>
-
-    </form>
+    </article>
 @endsection
