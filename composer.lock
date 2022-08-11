@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0aa647111df22b6ff1c89c10b427e3fb",
+    "content-hash": "5e8188012a192c5d6c45810f53396822",
     "packages": [
         {
             "name": "brick/math",
@@ -61,6 +61,45 @@
                 }
             ],
             "time": "2022-08-01T22:54:31+00:00"
+        },
+        {
+            "name": "components/font-awesome",
+            "version": "6.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/components/font-awesome.git",
+                "reference": "2c8dd579722272a218d2cfb510d7ca2d239e48ad"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/components/font-awesome/zipball/2c8dd579722272a218d2cfb510d7ca2d239e48ad",
+                "reference": "2c8dd579722272a218d2cfb510d7ca2d239e48ad",
+                "shasum": ""
+            },
+            "type": "component",
+            "extra": {
+                "component": {
+                    "styles": [
+                        "css/all.css"
+                    ],
+                    "files": [
+                        "css/all.min.css",
+                        "webfonts/*"
+                    ]
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "CC-BY-4.0",
+                "MIT",
+                "OFL-1.1"
+            ],
+            "description": "Font Awesome, the iconic SVG, font, and CSS framework.",
+            "support": {
+                "issues": "https://github.com/components/font-awesome/issues",
+                "source": "https://github.com/components/font-awesome/tree/6.1.2"
+            },
+            "time": "2022-07-29T06:42:00+00:00"
         },
         {
             "name": "dflydev/dot-access-data",
