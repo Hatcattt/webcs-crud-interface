@@ -753,5 +753,8 @@
     "Tasks creation": "Création de tâches",
 
     "Theme": "Thème",
-    "Homepage": "Accueil"
+    "Homepage": "Page d'accueil",
+    "Home": "Accueil",
+    "Continue to your crud interface": "Continuez vers votre interface crud",
+    "Complete this to proceed to the next step": "Complétez ceci pour passer à l'étape suivante"
 }

@@ -6,10 +6,18 @@ body {
     font-family: 'Nunito', sans-serif;
 }
 
-/*:root {*/
-/*    --primary: #7cb342;*/
-/*}*/
-
 .navi {
     box-shadow: #2d3748 0px 5px 20px;
+}
+
+.msg-error {
+    font-size: 15px;
+    color: #ff4545;
+}
+
+.bloc-error {
+    background-color: #e1e1e1;
+    border-radius: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
