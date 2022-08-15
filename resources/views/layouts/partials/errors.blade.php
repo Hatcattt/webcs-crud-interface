@@ -1,4 +1,4 @@
-@if(isset ($errors) && count($errors) > 0)
+@if($errors->any())
     <div>
         <ul class="bloc-error">
             @foreach($errors->all() as $error)

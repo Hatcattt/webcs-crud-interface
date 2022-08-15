@@ -14,6 +14,7 @@ class EnsureUserHasRole
      *
      * @param Request $request
      * @param Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
+     * @param string $role
      * @return Response|RedirectResponse
      */
     public function handle(Request $request, Closure $next, string $role)
@@ -21,7 +22,6 @@ class EnsureUserHasRole
         if ($request->user()->role === $role) {
             return $next($request);
         }
-
         abort(403);
     }
 }

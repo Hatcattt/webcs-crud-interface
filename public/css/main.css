@@ -21,3 +21,43 @@ body {
     padding-top: 5px;
     padding-bottom: 5px;
 }
+
+.foot {
+    text-align: center;
+    margin: auto; !important;
+    padding: 10px; !important;
+}
+
+.action {
+    margin: 0;
+    padding: 0;
+}
+
+.fa-pen-to-square {
+    color: #18ad36;
+}
+
+.fa-trash {
+    color: #c22828;
+    border: none;
+    text-align: center;
+    opacity: 0.6;
+    transition: 0.3s;
+}
+
+.fa-trash:hover {
+    opacity: 1;
+}
+
+a {
+    text-decoration-line: none; !important;
+}
+
+.danger {
+    text-align: center; !important;
+    border: none; !important;
+}
+
+a:hover {
+   text-decoration: none; !important;
+}

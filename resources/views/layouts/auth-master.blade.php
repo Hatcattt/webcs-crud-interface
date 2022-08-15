@@ -6,7 +6,9 @@
 @include('layouts.partials.navbar')
 
 <main class="container">
-    @yield('content')
+    <article class="grid">
+        @yield('content')
+    </article>
 </main>
 
 @include('layouts.partials.footer')

@@ -15,9 +15,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['namespace' => 'App\Http\Controllers'], function()
 {
-    /**
-     * Home Routes
-     */
     Route::get('/', 'HomeController@index')->name('home.index');
 
     Route::group(['middleware' => ['guest']], function() {
@@ -29,14 +26,15 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
 
     });
 
-    // logout route only if user is authenticated
     Route::group(['middleware' => ['auth']], function() {
         Route::get('/logout', 'LogoutController@perform')->name('logout.perform');
-        // route pour lire les données (uniquement)
+        Route::get('/crud', 'CrudController@index')->name('crud.index');
+
+        include('crud-routing.php');
     });
 
     Route::middleware(['auth', 'role:admin'])->group(function () {
-        // route pour CRUD
-        // route pour exporter en excel.
+        Route::get('/users', 'UserController@edit')->name('users.edit');
+        include('export-routing.php');
     });
 });

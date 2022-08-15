@@ -19,7 +19,6 @@ class BaseReaderUserSeeder extends Seeder
             'username' => 'test',
             'email' => 'test@gmail.com',
             'password' => Hash::make('test1234'),
-            'role' => 'reader',
         ]);
     }
 }
