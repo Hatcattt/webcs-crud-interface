@@ -19,6 +19,7 @@ Ce projet Laravel permet de faire un CRUD sur une base de données fournie.
 - mariadb ou mysql
 
 <h2 style="text-decoration: underline">Installation</h2>
+
 ```
 git clone https://gitlab.com/...chemin complet
 cd webcs-crud-interface
