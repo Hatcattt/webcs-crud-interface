@@ -16,9 +16,9 @@ class BaseReaderUserSeeder extends Seeder
     public function run()
     {
         DB::table('users')->insert([
-            'username' => 'test',
-            'email' => 'test@gmail.com',
-            'password' => Hash::make('test1234'),
+            'username' => 'read',
+            'email' => 'read@gmail.com',
+            'password' => Hash::make('read1234'),
         ]);
     }
 }
