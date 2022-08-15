@@ -51,8 +51,11 @@ class BusinessController extends Controller
         Abord::ifReader();
         request()->validate(Business::$rules);
 
-        $business = Business::create($request->all());
-
+        try {
+            $business = Business::create($request->all());
+        } catch (\Exception $e) {
+            return redirect()->route('business.index')->with('error', 'Error : Unable to execute this action !');
+        }
         return redirect()->route('business.index')
             ->with('success', 'Business created successfully.');
     }

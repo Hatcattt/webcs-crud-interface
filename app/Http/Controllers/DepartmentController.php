@@ -51,8 +51,11 @@ class DepartmentController extends Controller
         Abord::ifReader();
         request()->validate(Department::$rules);
 
-        $department = Department::create($request->all());
-
+        try {
+            $department = Department::create($request->all());
+        } catch (\Exception $e) {
+            return redirect()->route('department.index')->with('error', 'Error : Unable to execute this action !');
+        }
         return redirect()->route('department.index')
             ->with('success', 'Department created successfully.');
     }

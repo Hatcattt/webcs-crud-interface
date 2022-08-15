@@ -54,8 +54,11 @@ class IndividualController extends Controller
         Abord::ifReader();
         request()->validate(Individual::$rules);
 
-        $individual = Individual::create($request->all());
-
+        try {
+            $individual = Individual::create($request->all());
+        } catch (Exception $e) {
+            return redirect()->route('individual.index')->with('error', 'Error : Unable to execute this action !');
+        }
         return redirect()->route('individual.index')
             ->with('success', 'Individual created successfully.');
     }

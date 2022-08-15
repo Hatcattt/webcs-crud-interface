@@ -59,8 +59,11 @@ class AccountController extends Controller
         Abord::ifReader();
         request()->validate(Account::$rules);
 
-        $account = (new Account)->create($request->all());
-
+        try {
+            $account = (new Account)->create($request->all());
+        } catch (Exception $e) {
+            return redirect()->route('account.index')->with('error', 'Error : Unable to execute this action !');
+        }
         return redirect()->route('account.index')
             ->with('success', 'Account created successfully.');
     }

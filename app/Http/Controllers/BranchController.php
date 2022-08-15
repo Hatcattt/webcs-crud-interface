@@ -51,8 +51,11 @@ class BranchController extends Controller
         Abord::ifReader();
         request()->validate(Branch::$rules);
 
-        $branch = Branch::create($request->all());
-
+        try {
+            $branch = Branch::create($request->all());
+        } catch (\Exception $e) {
+            return redirect()->route('branch.index')->with('error', 'Error : Unable to execute this action !');
+        }
         return redirect()->route('branch.index')
             ->with('success', 'Branch created successfully.');
     }

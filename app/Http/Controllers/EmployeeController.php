@@ -51,7 +51,11 @@ class EmployeeController extends Controller
         Abord::ifReader();
         request()->validate(Employee::$rules);
 
-        $employee = Employee::create($request->all());
+        try {
+            $employee = Employee::create($request->all());
+        } catch (\Exception $e) {
+            return redirect()->route('employee.index')->with('error', 'Error : Unable to execute this action !');
+        }
 
         return redirect()->route('employee.index')
             ->with('success', 'Employee created successfully.');

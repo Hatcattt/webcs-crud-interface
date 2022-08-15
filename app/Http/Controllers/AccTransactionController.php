@@ -51,8 +51,11 @@ class AccTransactionController extends Controller
         Abord::ifReader();
         request()->validate(AccTransaction::$rules);
 
-        $acc_transaction = AccTransaction::create($request->all());
-
+        try {
+            $acc_transaction = AccTransaction::create($request->all());
+        } catch (\Exception $e) {
+            return redirect()->route('acc-transaction.index')->with('error', 'Error : Unable to execute this action !');
+        }
         return redirect()->route('acc-transaction.index')
             ->with('success', 'Acc transaction created successfully.');
     }

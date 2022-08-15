@@ -51,8 +51,11 @@ class CustomerController extends Controller
         Abord::ifReader();
         request()->validate(Customer::$rules);
 
-        $customer = Customer::create($request->all());
-
+        try {
+            $customer = Customer::create($request->all());
+        } catch (\Exception $e) {
+            return redirect()->route('customer.index')->with('error', 'Error : Unable to execute this action !');
+        }
         return redirect()->route('customer.index')
             ->with('success', 'Customer created successfully.');
     }

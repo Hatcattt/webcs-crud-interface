@@ -51,7 +51,11 @@ class OfficerController extends Controller
         Abord::ifReader();
         request()->validate(Officer::$rules);
 
-        $officer = Officer::create($request->all());
+        try {
+            $officer = Officer::create($request->all());
+        } catch (\Exception $e) {
+            return redirect()->route('officer.index')->with('error', 'Error : Unable to execute this action !');
+        }
 
         return redirect()->route('officer.index')
             ->with('success', 'Officer created successfully.');
