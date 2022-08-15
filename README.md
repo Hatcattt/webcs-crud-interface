@@ -26,8 +26,13 @@ cd webcs-crud-interface
 composer install
 cp .env.example .env
 php artisan key:generate
-Modifiez le fichier .env pour votre base de données
-php artisan migrate:fresh --seed
+
+Modifiez le fichier .env pour votre base de données,
+puis faites la migration et le seed.
+
+php artisan migrate
+php artisan db:seed
+
 php artisan serve
 
 Visitez localhost:8000 dans votre navigateur.
