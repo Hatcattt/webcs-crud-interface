@@ -1,46 +1,42 @@
 @extends('layouts.app-master')
 
-@section('title', "Users")
-@section('title_small', "Ici, vous pouvez voir les users présents dans votre système.")
+@section('title')
+    {{ Auth::user() == $user ? "Edit yourself" : "Edit a User"}}
+@endsection
+@section('title_small', "Editez un utilisateur du system.")
 
 @section('content')
-    <figure>
-        <table>
-            <thead>
-            <tr>
-                <th scope="col">N°</th>
-                <th scope="col">Username</th>
-                <th scope="col">Email</th>
-                <th scope="col">Rôle</th>
-{{--                <th scope="col">Make</th>--}}
-            </tr>
-            </thead>
-            <tbody>
-            @foreach($users as $user)
-                @if (Auth::user()->username === $user->username) @continue @endif
+    @include('layouts.partials.errors')
 
-                <tr>
-                    <th scope="row">{{ $user->id-1 }}</th>
-                    <td>{{ $user->username }}</td>
-                    <td>{{ $user->email }}</td>
-                    <td>{{ $user->role }}</td>
-{{--                    <td>--}}
-{{--                        @if ($user->role === 'reader')--}}
-{{--                        <label for="switch">--}}
-{{--                            <input type="checkbox" id="switch" name="switch" role="switch">Admin--}}
-{{--                        </label>--}}
-{{--                        @else--}}
-{{--                            <label for="switch">--}}
-{{--                                <input type="checkbox" id="switch" name="switch" role="switch">Reader--}}
-{{--                            </label>--}}
-{{--                        @endif--}}
-{{--                    </td>--}}
-                </tr>
-            @endforeach
-            </tbody>
-        </table>
-        <div>
-            <a role="button" class="outline" disabled>Save</a>
-        </div>
-    </figure>
+    <div>
+        <form method="POST" action="{{ route('users.update', $user) }}"  role="form" enctype="multipart/form-data">
+            {{ method_field('PATCH') }}
+            @csrf
+
+            <div class="form-group">
+                {{ Form::label('username', 'User Name') }}
+                {{ Form::text('username', old('username', $user), ['placeholder' => 'ex : Super User']) }}
+            </div>
+            <div class="form-group">
+                {{ Form::label('email', 'Email') }}
+                {{ Form::text('email', $user->email, ['placeholder' => 'ex : example@gmail.com']) }}
+            </div>
+            <div class="form-group">
+                {{ Form::label('password', 'Password') }}
+                {{ Form::password('password', old('password')) }}
+            </div>
+            @if(Auth::user()->username != $user->username)
+                <div class="form-group">
+                    {{ Form::label('role') }}
+                    {{ Form::select('role', $user->roles(), old('role', $user), ['class' => 'form-control']) }}
+                </div>
+            @endif
+            <div class="box-footer mt20">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+            <div class="btn-back">
+                <a title="Stop and return" role="button" href={{ Auth::user()->role == 'reader' ? route('home.index') : route('users.index') }}> Cancel</a>
+            </div>
+        </form>
+    </div>
 @endsection

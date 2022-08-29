@@ -1,45 +1,51 @@
 @extends('layouts.app-master')
 
-@section('title', "Show")
-@section('title_small', "Voici l'aperçu de votre record.")
+@section('title', "Show employee")
+@section('title_small', "Voici les informations de l'employee.")
 
 @section('content')
-    <a title="Get back" role="button" href="{{ route('employee.index') }}"> BACK</a>
+<div class="btn-back">
+    <a title="Get back" role="button" href="{{ url()->previous() }}"> BACK</a>
+</div>
 
-    <div class="form-group">
-        <strong>Emp Id:</strong>
+    <div>
+        <strong>Empployee N°:</strong>
         {{ $employee->emp_id }}
     </div>
-    <div class="form-group">
+    <div>
         <strong>End Date:</strong>
         {{ $employee->end_date }}
     </div>
-    <div class="form-group">
+    <div>
         <strong>First Name:</strong>
         {{ $employee->first_name }}
     </div>
-    <div class="form-group">
+    <div>
         <strong>Last Name:</strong>
         {{ $employee->last_name }}
     </div>
-    <div class="form-group">
+    <div>
         <strong>Start Date:</strong>
         {{ $employee->start_date }}
     </div>
-    <div class="form-group">
+    <div>
         <strong>Title:</strong>
         {{ $employee->title }}
     </div>
-    <div class="form-group">
-        <strong>Assigned Branch Id:</strong>
-        {{ $employee->assigned_branch_id }}
+    <div>
+        <strong>Assigned Branch:</strong>
+        {{ $employee->branch->name }}
     </div>
-    <div class="form-group">
-        <strong>Dept Id:</strong>
-        {{ $employee->dept_id }}
+    <div>
+        <strong>Deptatement:</strong>
+        {{ $employee->department->name }}
     </div>
-    <div class="form-group">
-        <strong>Superior Emp Id:</strong>
-        {{ $employee->superior_emp_id }}
+    <div>
+        <strong>Superior Empployee:</strong>
+        @if($employee->superior_emp_id == null || $employee->superior_emp_id == $employee->emp_id)
+            None
+        @else
+            {{ $employee->employee->full_name }}
+        @endif
     </div>
 @endsection

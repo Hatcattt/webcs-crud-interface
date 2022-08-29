@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Custom\Abord\Abord;
 use App\Exports\EmployeeExport;
+use App\Models\Branch;
+use App\Models\Department;
 use App\Models\Employee;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Schema;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -16,6 +17,15 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  */
 class EmployeeController extends Controller
 {
+
+    /**
+     *  Middleware to ensure that a user who have "reader" role, can only see index() and show() methods.
+     */
+    public function __construct()
+    {
+        $this->middleware(['auth', 'role:admin'], ['except' => ['show', 'index']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -23,9 +33,8 @@ class EmployeeController extends Controller
      */
     public function index()
     {
-        $employees = Employee::get();
-        $columns = Schema::getColumnListing('employee');
-        return view('crud.employee.index', compact('employees', 'columns'));
+        $employees = Employee::with(['branch', 'department', 'employee'])->paginate();
+        return view('crud.employee.index', compact('employees'));
     }
 
     /**
@@ -35,9 +44,13 @@ class EmployeeController extends Controller
      */
     public function create()
     {
-        Abord::ifReader();
         $employee = new Employee();
-        return view('crud.employee.create', compact('employee'));
+
+        $branchs = Branch::all()->pluck('name','branch_id');
+        $departments = Department::all()->pluck('name', 'dept_id');
+        $superiors = Employee::all()->pluck('full_name', 'emp_id');
+
+        return view('crud.employee.create', compact('employee', 'branchs', 'departments', 'superiors'));
     }
 
     /**
@@ -48,13 +61,12 @@ class EmployeeController extends Controller
      */
     public function store(Request $request)
     {
-        Abord::ifReader();
         request()->validate(Employee::$rules);
 
         try {
             $employee = Employee::create($request->all());
         } catch (\Exception $e) {
-            return redirect()->route('employee.index')->with('error', 'Error : Unable to execute this action !');
+            return redirect()->back()->with('error', 'Error : Unable to execute this action !');
         }
 
         return redirect()->route('employee.index')
@@ -79,10 +91,13 @@ class EmployeeController extends Controller
      */
     public function edit($id)
     {
-        Abord::ifReader();
         $employee = Employee::findOrFail($id);
 
-        return view('crud.employee.edit', compact('employee'));
+        $branchs = Branch::all()->pluck('name','branch_id');
+        $departments = Department::all()->pluck('name', 'dept_id');
+        $superiors = Employee::all()->pluck('full_name', 'emp_id');
+
+        return view('crud.employee.edit', compact('employee', 'branchs', 'departments', 'superiors'));
     }
 
     /**
@@ -94,13 +109,12 @@ class EmployeeController extends Controller
      */
     public function update(Request $request, Employee $employee)
     {
-        Abord::ifReader();
         request()->validate(Employee::$rules);
 
         try {
             $employee->update($request->all());
         } catch (\Exception $e) {
-            return redirect()->route('employee.index')->with('error', 'Error : Unable to execute this action !');
+            return redirect()->back()->with('error', 'Error : Unable to execute this action !');
         }
         return redirect()->route('employee.index')
             ->with('success', 'Employee updated successfully');
@@ -112,7 +126,6 @@ class EmployeeController extends Controller
      */
     public function destroy($id)
     {
-        Abord::ifReader();
         try {
             $employee = Employee::findOrFail($id)->delete();
         } catch (\Exception $e) {

@@ -34,20 +34,22 @@ class AccTransaction extends Model
     public $timestamps = false;
 
     static $rules = [
-		'txn_id' => 'required|int',
-		'amount' => 'required',
+		'amount' => 'required|numeric|min:1',
 		'funds_avail_date' => 'required|date',
 		'txn_date' => 'required|date',
+        'txn_type_cd' => 'string|max:10|nullable',
+        'execution_branch_id' => 'nullable',
+        'teller_emp_id' => 'nullable'
     ];
 
-    protected $perPage = 20;
+    protected $perPage = 10;
 
     /**
      * Attributes that should be mass-assignable.
      *
      * @var array
      */
-    protected $fillable = ['txn_id','amount','funds_avail_date','txn_date','txn_type_cd', 'account_id'];
+    protected $fillable = ['amount','funds_avail_date','txn_date','txn_type_cd', 'account_id', 'execution_branch_id', 'teller_emp_id'];
 
     /**
      * @return array
@@ -56,7 +58,6 @@ class AccTransaction extends Model
     {
         return $this->fillable;
     }
-
 
 
     /**

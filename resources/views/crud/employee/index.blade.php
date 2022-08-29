@@ -1,7 +1,7 @@
 @extends('layouts.app-master')
 
-@section('title', "Employee")
-@section('title_small', "Voici le contenu de la table.")
+@section('title', "Employees")
+@section('title_small', "La liste de tous les employés présents dans votre organisation.")
 
 @section('content')
 
@@ -18,8 +18,18 @@
     <figure>
         <table>
             <thead>
-            @include('layouts.partials.columns-name')
-
+                <tr>
+                    <th scope="col"><strong>N°</strong></th>
+                    <th scope="col"><strong>End Date</strong></th>
+                    <th scope="col"><strong>First Name</strong></th>
+                    <th scope="col"><strong>Last Name</strong></th>
+                    <th scope="col"><strong>Start Name</strong></th>
+                    <th scope="col"><strong>Title</strong></th>
+                    <th scope="col"><strong>Assigned Branch</strong></th>
+                    <th scope="col"><strong>Department</strong></th>
+                    <th scope="col"><strong>Superior</strong></th>
+                    <th><strong>Actions</strong></th>
+                </tr>
             </thead>
             <tbody>
             @foreach($employees as $employee)
@@ -30,20 +40,32 @@
                     <td>{{ $employee->last_name }}</td>
                     <td>{{ $employee->start_date }}</td>
                     <td>{{ $employee->title }}</td>
-                    <td>{{ $employee->assigned_branch_id }}</td>
-                    <td>{{ $employee->dept_id }}</td>
-                    <td>{{ $employee->superior_emp_id }}</td>
-
+                    <td>{{ $employee->branch->name }}</td>
+                    <td>{{ $employee->department->name }}</td>
+                        @if($employee->superior_emp_id == null || $employee->superior_emp_id == $employee->emp_id)
+                            <td>None</td>
+                        @else
+                            <td>{{ $employee->employee->full_name }}</td>
+                        @endif
                     <td>
-                        <form action="{{ route('employee.destroy', $employee) }}" method="POST" id="del">
-                                <a type="button" title="Show" href="{{ route('employee.show', $employee) }}" class="fa-solid fa-eye fa-2xl"></a>
+                        <form action="{{ route('employee.destroy', $employee) }}" method="POST" class="no-mrg">
+                            <div class="action-grid">
+                                <div style="padding-right: 5px;">
+                                    <a type="button" title="Show" href="{{ route('employee.show', $employee) }}" class="fa-solid fa-eye fa-2xl"></a>
+                                </div>
 
-                            @if(Auth::user()->role === 'admin')
-                                <a title="Edit" href="{{ route('employee.edit', $employee) }}" class="fa-solid fa-pen-to-square fa-2xl"></a>
-                                @csrf
-                                @method('DELETE')
-                                <button title="Delete" type="submit" class="fa fa-fw fa-trash fa-2xl outline"></button>
-                            @endif
+                                @if(Auth::user()->role === 'admin')
+                                    <div>
+                                        <a title="Edit" href="{{ route('employee.edit', $employee) }}" class="fa-solid fa-pen-to-square fa-2xl"></a>
+                                    </div>
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <div>
+                                        <button style="padding: 0;" title="Delete" type="submit" class="fa fa-fw fa-trash fa-2xl outline"></button>
+                                    </div>
+                                @endif
+                            </div>
                         </form>
                     </td>
                 </tr>
@@ -51,4 +73,9 @@
             </tbody>
         </table>
     </figure>
+
+    {{ $employees->links() }}
+    <div style="text-align: center">
+        <a href="#" class="fa-solid fa-circle-arrow-up fa-2xl" title="Go top page"></a>
+    </div>
 @endsection

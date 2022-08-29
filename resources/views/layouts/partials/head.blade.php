@@ -10,4 +10,9 @@
     <link href="{{ asset('css/main.css') }}" rel="stylesheet">
     <link href="{{ asset('css/pico.css') }}" rel="stylesheet">
     <link href="{{ asset('font-awesome/css/all.css') }}" rel="stylesheet" >
+
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
 </head>

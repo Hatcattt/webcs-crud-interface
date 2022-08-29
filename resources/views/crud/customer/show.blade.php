@@ -1,36 +1,43 @@
 @extends('layouts.app-master')
 
-@section('title', "Show")
-@section('title_small', "Voici l'aperçu de votre record.")
+@section('title', "Show customer")
+@section('title_small', "Voici l'aperçu des informations du client.")
 
 @section('content')
-    <a title="Get back" role="button" href="{{ route('customer.index') }}"> BACK</a>
+    <a title="Get back" role="button" href={{ route('customer.index') }}> BACK</a>
 
-    <div class="form-group">
-        <strong>Cust Id:</strong>
+    <div>
+        <strong>Customer N°:</strong>
         {{ $customer->cust_id }}
     </div>
-    <div class="form-group">
+    <div>
         <strong>Address:</strong>
         {{ $customer->address }}
     </div>
-    <div class="form-group">
+    <div>
         <strong>City:</strong>
         {{ $customer->city }}
     </div>
-    <div class="form-group">
-        <strong>Cust Type Cd:</strong>
-        {{ $customer->cust_type_cd }}
+    <div>
+        <strong>Customer Type:</strong>
+        @switch($customer->cust_type_cd)
+            @case('i')
+                <a href={{ route('individual.show', $customer->cust_id) }} tirle="Go see">Individual</a>
+                @break
+            @case('b')
+                <a href={{ route('business.show', $customer->cust_id) }} tirle="Go see">Business</a>
+                @break
+        @endswitch
     </div>
-    <div class="form-group">
-        <strong>Fed Id:</strong>
+    <div>
+        <strong>Federal ID Code:</strong>
         {{ $customer->fed_id }}
     </div>
-    <div class="form-group">
+    <div>
         <strong>Postal Code:</strong>
         {{ $customer->postal_code }}
     </div>
-    <div class="form-group">
+    <div>
         <strong>State:</strong>
         {{ $customer->state }}
     </div>

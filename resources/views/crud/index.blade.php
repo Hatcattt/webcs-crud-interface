@@ -1,16 +1,20 @@
 @extends('layouts.app-master')
 
-@section('title', "CRUD Interface")
+@section('title')
+    @if(Auth::user()->role === 'admin')
+        Manage your organisation here
+    @else
+        Take a look inside your organisation here
+    @endif
+@endsection
 @section('title_small')
     @if(Auth::user()->role === 'admin')
-        <h2>Ici, vous pouvez faire un <strong>CRUD</strong> sur la base de données.</h2>
+        <h2>Organisez vos différentes branches.</h2>
     @else
-        <h2>Ici, vous pouvez lire la base de données.</h2>
+        <h2>Visionnez les différentes branches présentent dans l'organisation.</h2>
     @endif
 @endsection
 
 @section('content')
-    <div class="container-fluid">
-        @include('layouts.partials.table-list')
-    </div>
+    @include('layouts.partials.table-list')
 @endsection

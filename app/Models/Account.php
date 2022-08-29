@@ -34,13 +34,17 @@ class Account extends Model
     public $timestamps = false;
 
     static $rules = [
-		'account_id' => 'required',
-		'open_date' => 'required',
-        'open_branch_id'=> 'required'
-
+        'avail_balance' => 'numeric|min:1|nullable',
+        'close_date' => 'date|nullable',
+        'last_activity_date' => 'date|nullable',
+        'open_date' => 'required|date',
+        'pending_balance' => 'numeric|min:0|nullable',
+        'status' => 'string|max:10|nullable',
+        'open_emp_id' => 'required',
+        'product_cd' => 'required'
     ];
 
-    protected $perPage = 20;
+    protected $perPage = 10;
 
     /**
      * Attributes that should be mass-assignable.

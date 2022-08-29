@@ -30,11 +30,11 @@ class Product extends Model
     protected $keyType = 'string';
 
     static $rules = [
-		'product_cd' => 'required',
-		'name' => 'required',
+        'product_cd' => 'required|string|max:10',
+		'name' => 'required|string|max:50',
     ];
 
-    protected $perPage = 20;
+    protected $perPage = 10;
 
     /**
      * Attributes that should be mass-assignable.

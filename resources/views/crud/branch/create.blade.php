@@ -1,7 +1,7 @@
 @extends('layouts.app-master')
 
-@section('title', "Create")
-@section('title_small', "Créez un record.")
+@section('title', "Create a branch")
+@section('title_small', "Créez une nouvelle filiale dans votre organisation.")
 
 @section('content')
     @include('layouts.partials.errors')

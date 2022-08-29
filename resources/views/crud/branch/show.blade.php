@@ -1,32 +1,36 @@
 @extends('layouts.app-master')
 
-@section('title', "Show")
-@section('title_small', "Voici l'aperçu de votre record.")
+@section('title')
+Branch N° : {{ $branch->branch_id }}
+@endsection
+@section('title_small', "Voici plus d'informations sur la branche.")
 
 @section('content')
-    <a title="Get back" role="button" href="{{ route('branch.index') }}"> BACK</a>
+<div class="btn-back">
+    <a title="Get back" role="button" href="{{ url()->previous() }}"> BACK</a>
+</div>
 
-    <div class="form-group">
-        <strong>Branch Id:</strong>
+    <div>
+        <strong>Branch N°:</strong>
         {{ $branch->branch_id }}
     </div>
-    <div class="form-group">
+    <div>
         <strong>Address:</strong>
         {{ $branch->address }}
     </div>
-    <div class="form-group">
+    <div>
         <strong>City:</strong>
         {{ $branch->city }}
     </div>
-    <div class="form-group">
+    <div>
         <strong>Name:</strong>
         {{ $branch->name }}
     </div>
-    <div class="form-group">
+    <div>
         <strong>State:</strong>
         {{ $branch->state }}
     </div>
-    <div class="form-group">
+    <div>
         <strong>Zip Code:</strong>
         {{ $branch->zip_code }}
     </div>

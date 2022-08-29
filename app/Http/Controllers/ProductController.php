@@ -20,6 +20,15 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  */
 class ProductController extends Controller
 {
+
+    /**
+     *  Middleware to ensure that a user who have "reader" role, can only see index() and show() methods.
+     */
+    public function __construct()
+    {
+        $this->middleware(['auth', 'role:admin'], ['except' => ['show', 'index']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -27,9 +36,8 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::get();
-        $columns = Schema::getColumnListing('product');
-        return view('crud.product.index', compact('products', 'columns'));
+        $products = Product::paginate();
+        return view('crud.product.index', compact('products'));
     }
 
     /**
@@ -39,9 +47,8 @@ class ProductController extends Controller
      */
     public function create()
     {
-        Abord::ifReader();
         $product = new Product();
-        $type_cd = (new ProductType)->pluck('product_type_cd', 'product_type_cd');
+        $type_cd = ProductType::all()->pluck('product_type_cd', 'product_type_cd');
         return view('crud.product.create', compact('product', 'type_cd'));
     }
 
@@ -53,14 +60,13 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        Abord::ifReader();
         request()->validate(Product::$rules);
 
-        try {
+        // try {
             $product = Product::create($request->all());
-        } catch (\Exception $e) {
-            return redirect()->route('product.index')->with('error', 'Error : Unable to execute this action !');
-        }
+        // } catch (\Exception $e) {
+        //     return redirect()->route('product.index')->with('error', 'Error : Unable to execute this action !');
+        // }
         return redirect()->route('product.index')
             ->with('success', 'Product created successfully.');
     }
@@ -72,8 +78,8 @@ class ProductController extends Controller
     public function show($id)
     {
         $product = Product::findOrFail($id);
-
-        return view('crud.product.show', compact('product'));
+        $type_cd = (new ProductType)->pluck('product_type_cd');
+        return view('crud.product.show', compact('product', 'type_cd'));
     }
 
     /**
@@ -83,7 +89,6 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
-        Abord::ifReader();
         $product = Product::findOrFail($id);
         $type_cd = (new ProductType)->pluck('product_type_cd', 'product_type_cd');
         return view('crud.product.edit', compact('product', 'type_cd'));
@@ -98,9 +103,7 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        Abord::ifReader();
         request()->validate(Product::$rules);
-
         try {
             $product->update($request->all());
         } catch (\Exception $e) {
@@ -116,7 +119,6 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        Abord::ifReader();
         try {
             $product = Product::find($id)->delete();
         } catch (\Exception $e) {

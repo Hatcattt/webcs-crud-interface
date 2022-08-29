@@ -1,13 +1,24 @@
-/** {*/
-/*    border: 1px indianred solid;*/
-/*}*/
+/* * {
+   border: 1px indianred solid;
+} */
 
 body {
     font-family: 'Nunito', sans-serif;
 }
 
 .navi {
-    box-shadow: #2d3748 0px 5px 20px;
+    box-shadow: #2d3748 0px 5px 15px;
+}
+
+.summary-table {
+    margin-bottom: 20px;
+    font-size: 25px;
+}
+
+.left-menu-table {
+    width: 200px;
+    padding: 10px;
+    box-shadow: #676767 0px 5px 10px;
 }
 
 .msg-error {
@@ -49,8 +60,8 @@ body {
     opacity: 1;
 }
 
-a {
-    text-decoration-line: none; !important;
+a, a:hover, a:active, a:focus {
+    text-decoration: none; !important;
 }
 
 .danger {
@@ -58,6 +69,39 @@ a {
     border: none; !important;
 }
 
-a:hover {
-   text-decoration: none; !important;
+.no-pad {
+    padding: 0; !important;
+}
+
+.no-mrg {
+    margin: 0; !important;
+}
+
+.action-grid {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    margin: 10px;
+    max-width: 80px;
+}
+
+.users-edit-nav {
+    color:#383838;
+}
+
+.users-edit-nav:hover {
+    color:#585858
+}
+
+.btn-back {
+    padding-bottom: 20px;
+}
+
+.required {
+    color:red;
+    font-weight: bold;
+    padding-bottom: 20px;
+}
+
+.input-required {
+    color: gray;
 }

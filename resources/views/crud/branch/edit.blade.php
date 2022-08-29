@@ -1,7 +1,9 @@
 @extends('layouts.app-master')
 
-@section('title', "Edit")
-@section('title_small', "Editez le record.")
+@section('title', "Edit the branch")
+@section('title_small')
+    Éditez la filiale {{ $branch->name }} N° {{ $branch->branch_id }}
+@endsection
 
 @section('content')
     @include('layouts.partials.errors')

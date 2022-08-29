@@ -1,7 +1,7 @@
 @extends('layouts.app-master')
 
-@section('title', "Create")
-@section('title_small', "Créez un record.")
+@section('title', "Create a officer for the business customer")
+@section('title_small', "Créez titre pour le client de type business.")
 
 @section('content')
     @include('layouts.partials.errors')

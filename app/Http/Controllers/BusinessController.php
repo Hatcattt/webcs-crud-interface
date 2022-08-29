@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Custom\Abord\Abord;
-use App\Exports\BusinessExport;
+use App\Models\Officer;
 use App\Models\Business;
+use App\Models\Customer;
+use App\Custom\Abord\Abord;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Schema;
+use App\Exports\BusinessExport;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -16,6 +18,15 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  */
 class BusinessController extends Controller
 {
+
+    /**
+     *  Middleware to ensure that a user who have "reader" role, can only see index() and show() methods.
+     */
+    public function __construct()
+    {
+        $this->middleware(['auth', 'role:admin'], ['except' => ['show', 'index']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -23,9 +34,13 @@ class BusinessController extends Controller
      */
     public function index()
     {
-        $businesses = Business::get();
-        $columns = Schema::getColumnListing('business');
-        return view('crud.business.index', compact('businesses', 'columns'));
+        $businesses = Business::paginate();
+        $officers = DB::table('officer')
+            ->join('business', 'officer.cust_id', '=', 'business.cust_id')
+            ->select('officer.*')
+            ->get();
+
+        return view('crud.business.index', compact('businesses', 'officers'));
     }
 
     /**
@@ -35,9 +50,12 @@ class BusinessController extends Controller
      */
     public function create()
     {
-        Abord::ifReader();
         $business = new Business();
-        return view('crud.business.create', compact('business'));
+
+        session()->keep('cust_id');
+        $cust_id = session()->get('cust_id');
+
+        return view('crud.business.create', compact('business', 'cust_id'));
     }
 
     /**
@@ -48,16 +66,17 @@ class BusinessController extends Controller
      */
     public function store(Request $request)
     {
-        Abord::ifReader();
         request()->validate(Business::$rules);
+        session()->keep('cust_id');
+        $cust_id = session()->get('cust_id');
 
         try {
             $business = Business::create($request->all());
+
         } catch (\Exception $e) {
             return redirect()->route('business.index')->with('error', 'Error : Unable to execute this action !');
         }
-        return redirect()->route('business.index')
-            ->with('success', 'Business created successfully.');
+            return redirect()->route('officer.create')->with([ 'cust_id' => $cust_id ]);
     }
 
     /**
@@ -80,7 +99,6 @@ class BusinessController extends Controller
      */
     public function edit($id)
     {
-        Abord::ifReader();
         $business = Business::findOrFail($id);
         return view('crud.business.edit', compact('business'));
     }
@@ -94,17 +112,22 @@ class BusinessController extends Controller
      */
     public function update(Request $request, Business $business)
     {
-        Abord::ifReader();
         request()->validate(Business::$rules);
 
-        try {
-            $business->update($request->all());
-        } catch (\Exception $e) {
-            return redirect()->route('business.index')->with('error', 'Error : Unable to execute this action !');
+        if (Officer::where('cust_id', '=', $business->cust_id )->first() == null) {
+            return redirect()->route('business.index')->with('error', "Erreur : Vous n'avez pas créer d'officer pour se type de client.");
         }
+        $id = Officer::where('cust_id', '=', $business->cust_id )->first()->officer_id;
+        
+        if($request->input('choice') == "yes") {
 
-        return redirect()->route('business.index')
-            ->with('success', 'Business updated successfully');
+            $business->update($request->all());
+            return redirect(route('officer.edit', $id));
+        } else {
+
+            $business->update($request->all());
+            return redirect()->route('business.index')->with('success', 'Business updated successfully');
+        }
     }
 
     /**
@@ -114,7 +137,6 @@ class BusinessController extends Controller
      */
     public function destroy($id)
     {
-        Abord::ifReader();
         try {
             $business = Business::findOrFail($id)->delete();
         } catch (\Exception $e) {

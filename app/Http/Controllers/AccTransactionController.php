@@ -2,20 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Custom\Abord\Abord;
-use App\Exports\AccTransactionExport;
-use App\Models\AccTransaction;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Http\RedirectResponse;
+use App\Models\Branch;
+use App\Models\Account;
+use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Schema;
+use App\Models\AccTransaction;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\AccTransactionExport;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\Foundation\Application;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class AccTransactionController extends Controller
 {
+
+    /**
+     *  Middleware to ensure that a user who have "reader" role, can only see index() and show() methods.
+     */
+    public function __construct()
+    {
+        $this->middleware(['auth', 'role:admin'], ['except' => ['show', 'index']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -23,9 +33,8 @@ class AccTransactionController extends Controller
      */
     public function index()
     {
-        $acc_transactions = AccTransaction::get();
-        $columns = Schema::getColumnListing('acc_transaction');
-        return view('crud.acc-transaction.index', compact('acc_transactions', 'columns'));
+        $acc_transactions = AccTransaction::with('account','branch', 'employee', 'account.customer', 'account.customer.individual','account.customer.business')->paginate();
+        return view('crud.acc-transaction.index', compact('acc_transactions'));
     }
 
     /**
@@ -35,9 +44,13 @@ class AccTransactionController extends Controller
      */
     public function create()
     {
-        Abord::ifReader();
         $acc_transaction = new AccTransaction();
-        return view('crud.acc-transaction.create', compact('acc_transaction'));
+
+        $branches = Branch::all()->pluck('name','branch_id');
+        $employees = Employee::all()->pluck('full_name', 'emp_id');
+        $accounts = Account::with('customer', 'customer.individual', 'customer.business')->get();
+
+        return view('crud.acc-transaction.create', compact('acc_transaction', 'accounts', 'branches', 'employees'));
     }
 
     /**
@@ -48,16 +61,20 @@ class AccTransactionController extends Controller
      */
     public function store(Request $request)
     {
-        Abord::ifReader();
         request()->validate(AccTransaction::$rules);
-
-        try {
-            $acc_transaction = AccTransaction::create($request->all());
-        } catch (\Exception $e) {
-            return redirect()->route('acc-transaction.index')->with('error', 'Error : Unable to execute this action !');
+        
+        $accountTest = Account::find($request->account_id);
+        if ($request->amount > $accountTest->avail_balance) {
+            return redirect()->back()->with('error', "Erreur : Le montant de la transaction ne peut être supérieur au solde du client.");
         }
+
+        // try {
+            $acc_transaction = AccTransaction::create($request->all());
+        // } catch (\Exception $e) {
+        //     return redirect()->route('acc-transaction.index')->with('error', 'Error : Unable to execute this action !');
+        // }
         return redirect()->route('acc-transaction.index')
-            ->with('success', 'Acc transaction created successfully.');
+            ->with('success', 'Account transaction created successfully !');
     }
 
     /**
@@ -68,7 +85,7 @@ class AccTransactionController extends Controller
      */
     public function show($id)
     {
-        $acc_transaction = AccTransaction::findOrFail($id);
+        $acc_transaction = AccTransaction::with('account','branch', 'employee', 'account.customer', 'account.customer.individual','account.customer.business')->findOrFail($id);
         return view("crud.acc-transaction.show", compact("acc_transaction"));
     }
 
@@ -80,10 +97,12 @@ class AccTransactionController extends Controller
      */
     public function edit($id)
     {
-        Abord::ifReader();
         $acc_transaction = AccTransaction::findOrFail($id);
-
-        return view("crud.acc-transaction.edit", compact("acc_transaction"));
+        $accounts = Account::with('customer', 'customer.individual', 'customer.business')->get();
+        $branches = Branch::all()->pluck('name','branch_id');
+        $employees = Employee::all()->pluck('full_name', 'emp_id');
+        
+        return view("crud.acc-transaction.edit", compact("acc_transaction", 'accounts', 'branches', 'employees'));
     }
 
     /**
@@ -95,8 +114,13 @@ class AccTransactionController extends Controller
      */
     public function update(Request $request, AccTransaction $accTransaction)
     {
-        Abord::ifReader();
         request()->validate(AccTransaction::$rules);
+        $accountTest = Account::find($request->account_id);
+
+        if ($request->amount > $accountTest->avail_balance) {
+            return redirect()->back()->with('error', "Erreur : Le montant de la transaction ne peut être supérieur au solde du client.");
+        }
+
         try {
             $accTransaction->update($request->all());
         } catch (\Exception $e) {
@@ -104,7 +128,7 @@ class AccTransactionController extends Controller
         }
 
         return redirect()->route('acc-transaction.index')
-            ->with('success', 'Acc transaction updated successfully');
+            ->with('success', 'Account transaction updated successfully !');
     }
 
     /**
@@ -115,7 +139,6 @@ class AccTransactionController extends Controller
      */
     public function destroy($id)
     {
-        Abord::ifReader();
         try {
             $acc_transaction = AccTransaction::findOrFail($id)->delete();
         } catch (\Exception $e) {
@@ -123,7 +146,7 @@ class AccTransactionController extends Controller
         }
 
         return redirect()->route('acc-transaction.index')
-            ->with('success', 'Acc transaction deleted successfully');
+            ->with('success', 'Account transaction deleted successfully !');
     }
 
     /**

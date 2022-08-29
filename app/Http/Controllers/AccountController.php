@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Custom\Abord\Abord;
-use App\Exports\AccountExport;
+use Exception;
+use App\Models\Branch;
 use App\Models\Account;
 use App\Models\Product;
-use Exception;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Contracts\View\View;
-use Illuminate\Http\RedirectResponse;
+use App\Models\Customer;
+use App\Models\Employee;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Schema;
+use App\Exports\AccountExport;
+use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\Foundation\Application;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
@@ -22,6 +23,15 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  */
 class AccountController extends Controller
 {
+
+    /**
+     *  Middleware to ensure that a user who have "reader" role, can only see index() and show() methods.
+     */
+    public function __construct()
+    {
+        $this->middleware(['auth', 'role:admin'], ['except' => ['show', 'index']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -29,10 +39,8 @@ class AccountController extends Controller
      */
     public function index()
     {
-        $accounts = (new Account)->get();
-
-        $columns = Schema::getColumnListing('account');
-        return view('crud.account.index', compact('accounts', 'columns'));
+        $accounts = Account::with(['customer', 'branch', 'employee', 'product', 'customer.individual', 'customer.business'])->paginate();
+        return view('crud.account.index', compact('accounts'));
     }
 
     /**
@@ -42,10 +50,13 @@ class AccountController extends Controller
      */
     public function create()
     {
-        Abord::ifReader();
         $account = new Account();
-        $cd = (new Product)->pluck('product_cd', 'product_cd');
-        return view('crud.account.create', compact('account', 'cd'));
+        $customers = Customer::with(['individual', 'business'])->get();
+        $branches = Branch::all()->pluck('name','branch_id');
+        $employees = Employee::all()->pluck('full_name', 'emp_id');
+        $products = Product::all()->pluck('product_cd', 'product_cd');
+
+        return view('crud.account.create', compact('account', 'customers', 'branches', 'employees', 'products'));
     }
 
     /**
@@ -56,7 +67,6 @@ class AccountController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        Abord::ifReader();
         request()->validate(Account::$rules);
 
         try {
@@ -76,7 +86,7 @@ class AccountController extends Controller
      */
     public function show($id)
     {
-        $account = (new Account)->find($id);
+        $account = Account::with(['customer', 'branch', 'employee', 'product', 'customer.individual', 'customer.business'])->findOrFail($id);
         return view('crud.account.show', compact('account'));
     }
 
@@ -88,10 +98,13 @@ class AccountController extends Controller
      */
     public function edit($id)
     {
-        Abord::ifReader();
-        $account = (new Account)->find($id);
-        $cd = (new Product)->pluck('product_cd', 'product_cd');
-        return view('crud.account.edit', compact('account', 'cd'));
+        $account = (new Account)->findOrFail($id);
+        $customers = Customer::with(['individual', 'business'])->get();
+        $branches = Branch::all()->pluck('name','branch_id');
+        $employees = Employee::all()->pluck('full_name', 'emp_id');
+        $products = Product::all()->pluck('product_cd', 'product_cd');
+
+        return view('crud.account.edit', compact('account', 'customers', 'branches', 'employees', 'products'));
     }
 
     /**
@@ -103,14 +116,13 @@ class AccountController extends Controller
      */
     public function update(Request $request, Account $account): RedirectResponse
     {
-        Abord::ifReader();
         request()->validate(Account::$rules);
 
-        try {
+        // try {
             $account->update($request->all());
-        } catch (Exception $e) {
-            return redirect()->route('account.index')->with('error', 'Error : Unable to execute this action !');
-        }
+        // } catch (Exception $e) {
+        //     return redirect()->route('account.index')->with('error', 'Error : Unable to execute this action !');
+        // }
 
         return redirect()->route('account.index')
             ->with('success', 'Account updated successfully !');
@@ -123,11 +135,10 @@ class AccountController extends Controller
      */
     public function destroy($id): RedirectResponse
     {
-        Abord::ifReader();
         try {
             $account = (new Account)->find($id)->delete();
         } catch (Exception $e) {
-            return redirect()->route('account.index')->with('error', 'Error : Unable to execute this action !');
+            return redirect()->route('account.index')->with('error', 'Error : Le client possède des transactions bancaires !');
         }
 
         return redirect()->route('account.index')

@@ -23,12 +23,12 @@ class Business extends Model
     public $timestamps = false;
 
     static $rules = [
-		'name' => 'required',
-		'state_id' => 'required',
-		'cust_id' => 'required',
+        'incorp_date' => 'date',
+		'name' => 'required|string|max:255',
+		'state_id' => 'required|string|max:10',
     ];
 
-    protected $perPage = 20;
+    protected $perPage = 10;
 
     /**
      * Attributes that should be mass-assignable.

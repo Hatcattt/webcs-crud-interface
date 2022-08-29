@@ -1,7 +1,7 @@
 @extends('layouts.app-master')
 
-@section('title', "Branch")
-@section('title_small', "Voici le contenu de la table.")
+@section('title', "Branches")
+@section('title_small', "Les différentes filiales de votre organisation.")
 
 @section('content')
 
@@ -18,8 +18,15 @@
     <figure>
         <table>
             <thead>
-            @include('layouts.partials.columns-name')
-
+                <tr>
+                    <th scope="col"><strong>N°</strong></th>
+                    <th scope="col"><strong>Address</strong></th>
+                    <th scope="col"><strong>City</strong></th>
+                    <th scope="col"><strong>Name</strong></th>
+                    <th scope="col"><strong>State</strong></th>
+                    <th scope="col"><strong>Zip Code</strong></th>
+                    <th><strong>Actions</strong></th>
+                </tr>
             </thead>
             <tbody>
             @foreach($branches as $branch)
@@ -32,15 +39,18 @@
                     <td>{{ $branch->zip_code }}</td>
 
                     <td>
-                        <form action="{{ route('branch.destroy', $branch) }}" method="POST" id="del">
-                                <a type="button" title="Show" href="{{ route('branch.show', $branch) }}" class="fa-solid fa-eye fa-2xl"></a>
+                        <form action="{{ route('branch.destroy', $branch) }}" method="POST" class="no-mrg">
+                            <div class="action-grid">
+                                <div style="padding-right: 5px;"><a type="button" title="Show" href="{{ route('branch.show', $branch) }}" class="fa-solid fa-eye fa-2xl"></a></div>
 
-                            @if(Auth::user()->role === 'admin')
-                                <a title="Edit" href="{{ route('branch.edit', $branch) }}" class="fa-solid fa-pen-to-square fa-2xl"></a>
-                                @csrf
-                                @method('DELETE')
-                                <button title="Delete" type="submit" class="fa fa-fw fa-trash fa-2xl outline"></button>
-                            @endif
+                                @if(Auth::user()->role === 'admin')
+                                    <div><a title="Edit" href="{{ route('branch.edit', $branch) }}" class="fa-solid fa-pen-to-square fa-2xl"></a></div>
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <div><button style="padding: 0;" title="Delete" type="submit" class="fa fa-fw fa-trash fa-2xl outline"></button></div>
+                                @endif
+                            </div>
                         </form>
                     </td>
                 </tr>
@@ -48,4 +58,10 @@
             </tbody>
         </table>
     </figure>
+
+    {{ $branches->links() }}
+
+    <div style="text-align: center">
+        <a href="#" class="fa-solid fa-circle-arrow-up fa-2xl" title="Go top page"></a>
+    </div>
 @endsection

@@ -15,7 +15,7 @@ Ce projet Laravel permet de faire un CRUD sur une base de données fournie.
 
 - Laravel 9
 - composer
-- php 8
+- php 7|8
 - mariadb ou mysql
 
 <h2 style="text-decoration: underline">Installation</h2>

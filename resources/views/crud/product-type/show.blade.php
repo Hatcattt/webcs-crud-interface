@@ -1,13 +1,17 @@
 @extends('layouts.app-master')
 
-@section('title', "Show")
-@section('title_small', "Voici l'aperçu de votre record.")
+@section('title',' Show Product Type')
+@section('title_small')
+    Voici l'aperçu du produit : <strong>{{$product_type->name }}</strong>
+@endsection
 
 @section('content')
-    <a title="Get back" role="button" href="{{ route('product-type.index') }}"> BACK</a>
+<div class="btn-back">
+    <a title="Get back" role="button" href="{{ url()->previous() }}"> BACK</a>
+</div>
 
     <div class="form-group">
-        <strong>Product Type Cd:</strong>
+        <strong>Short name:</strong>
         {{ $product_type->product_type_cd }}
     </div>
     <div class="form-group">

@@ -16,6 +16,15 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  */
 class BranchController extends Controller
 {
+
+    /**
+     *  Middleware to ensure that a user who have "reader" role, can only see index() and show() methods.
+     */
+    public function __construct()
+    {
+        $this->middleware(['auth', 'role:admin'], ['except' => ['show', 'index']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -23,9 +32,8 @@ class BranchController extends Controller
      */
     public function index()
     {
-        $branches = Branch::get();
-        $columns = Schema::getColumnListing('branch');
-        return view('crud.branch.index', compact('branches', 'columns'));
+        $branches = Branch::paginate();
+        return view('crud.branch.index', compact('branches'));
     }
 
     /**
@@ -35,7 +43,6 @@ class BranchController extends Controller
      */
     public function create()
     {
-        Abord::ifReader();
         $branch = new Branch();
         return view('crud.branch.create', compact('branch'));
     }
@@ -48,7 +55,7 @@ class BranchController extends Controller
      */
     public function store(Request $request)
     {
-        Abord::ifReader();
+
         request()->validate(Branch::$rules);
 
         try {
@@ -80,7 +87,6 @@ class BranchController extends Controller
      */
     public function edit($id)
     {
-        Abord::ifReader();
         $branch = Branch::findOrFail($id);
         return view('crud.branch.edit', compact('branch'));
     }
@@ -94,7 +100,6 @@ class BranchController extends Controller
      */
     public function update(Request $request, Branch $branch)
     {
-        Abord::ifReader();
         request()->validate(Branch::$rules);
         try {
             $branch->update($request->all());
@@ -113,7 +118,6 @@ class BranchController extends Controller
      */
     public function destroy($id)
     {
-        Abord::ifReader();
         try {
             $branch = Branch::findOrFail($id)->delete();
         } catch (\Exception $e) {

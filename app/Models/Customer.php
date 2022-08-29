@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -29,12 +30,22 @@ class Customer extends Model
     public $timestamps = false;
 
     static $rules = [
-		'cust_id' => 'required',
-		'cust_type_cd' => 'required',
-		'fed_id' => 'required',
+        'address' => 'string|max:30|nullable',
+        'city' => 'string|max:20|nullable',
+		'fed_id' => 'required|regex:^([0-9]-)^',
+        'postal_code' => 'string|nullable|regex:^([0-9])^',
+        'state' => 'string|max:20|nullable',
     ];
 
-    protected $perPage = 20;
+    public static function getTypes() {
+        return 
+        [
+            "i" => "Individual", 
+            "b" => "Business",
+        ];
+    }
+
+    protected $perPage = 10;
 
     /**
      * Attributes that should be mass-assignable.
@@ -44,13 +55,22 @@ class Customer extends Model
     protected $fillable = ['cust_id','address','city','cust_type_cd','fed_id','postal_code','state'];
 
     /**
+     * @return Attribute city with ucfirst() method
+     */
+    protected function city(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => ucfirst($value),
+        );
+    }
+
+    /**
      * @return array
      */
     public function getFillable(): array
     {
         return $this->fillable;
     }
-
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
@@ -83,6 +103,4 @@ class Customer extends Model
     {
         return $this->hasMany('App\Models\Officer', 'cust_id', 'cust_id');
     }
-
-
 }

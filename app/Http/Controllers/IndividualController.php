@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Custom\Abord\Abord;
-use App\Exports\IndividualExport;
-use App\Models\Individual;
 use Exception;
-use Illuminate\Http\RedirectResponse;
+use App\Models\Individual;
+use App\Custom\Abord\Abord;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Routing\Route;
+use App\Exports\IndividualExport;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Schema;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
@@ -18,6 +19,15 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  */
 class IndividualController extends Controller
 {
+
+    /**
+     *  Middleware to ensure that a user who have "reader" role, can only see index() and show() methods.
+     */
+    public function __construct()
+    {
+        $this->middleware(['auth', 'role:admin'], ['except' => ['show', 'index']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -25,10 +35,8 @@ class IndividualController extends Controller
      */
     public function index()
     {
-        $individuals = Individual::get();
-        $columns = Schema::getColumnListing('individual');
-
-        return view('crud.individual.index', compact('individuals', 'columns'));
+        $individuals = Individual::with('customer')->paginate();
+        return view('crud.individual.index', compact('individuals'));
     }
 
     /**
@@ -38,9 +46,12 @@ class IndividualController extends Controller
      */
     public function create()
     {
-        Abord::ifReader();
         $individual = new Individual();
-        return view('crud.individual.create', compact('individual'));
+
+        session()->keep('cust_id');
+        $cust_id = session()->get('cust_id');
+
+        return view('crud.individual.create', compact('individual', 'cust_id'));
     }
 
     /**
@@ -51,7 +62,6 @@ class IndividualController extends Controller
      */
     public function store(Request $request)
     {
-        Abord::ifReader();
         request()->validate(Individual::$rules);
 
         try {
@@ -60,7 +70,7 @@ class IndividualController extends Controller
             return redirect()->route('individual.index')->with('error', 'Error : Unable to execute this action !');
         }
         return redirect()->route('individual.index')
-            ->with('success', 'Individual created successfully.');
+            ->with('success', 'Individual customer created successfully.');
     }
 
     /**
@@ -69,8 +79,7 @@ class IndividualController extends Controller
      */
     public function show($id)
     {
-        $individual = Individual::findOrFail($id);
-
+        $individual = Individual::with('customer')->findOrFail($id);
         return view('crud.individual.show', compact('individual'));
     }
 
@@ -80,9 +89,7 @@ class IndividualController extends Controller
      */
     public function edit($id)
     {
-        Abord::ifReader();
         $individual = Individual::findOrFail($id);
-
         return view('crud.individual.edit', compact('individual'));
     }
 
@@ -95,7 +102,6 @@ class IndividualController extends Controller
      */
     public function update(Request $request, Individual $individual)
     {
-        Abord::ifReader();
         request()->validate(Individual::$rules);
 
         try {
@@ -113,7 +119,6 @@ class IndividualController extends Controller
      */
     public function destroy($id)
     {
-        Abord::ifReader();
         try {
             $individual = Individual::findOrFail($id)->delete();
         } catch (Exception $e) {

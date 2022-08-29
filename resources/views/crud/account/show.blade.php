@@ -1,53 +1,88 @@
 @extends('layouts.app-master')
 
-@section('title', "Show")
-@section('title_small', "Voici l'aperçu de votre record.")
+@section('title')
+Account N° : {{ $account->account_id }}
+@endsection
+@section('title_small')
+Voici le compte de 
+    @switch($account->customer->cust_type_cd)
+        @case("i")
+            <strong>{{ $account->customer->individual->first_name . ' ' . $account->customer->individual->last_name }}</strong>
+            @break
+        @case("b")
+            <strong>{{ $account->customer->business->name }}</strong> : type Business
+            @break
+        @default "None"
+    @endswitch
+@endsection
 
 @section('content')
-    <a title="Get back" role="button" href="{{ route('account.index') }}"> BACK</a>
+    <div class="btn-back">
+        <a title="Get back" role="button" href="{{ url()->previous() }}"> BACK</a>
+    </div>
 
-    <div class="form-group">
-        <strong>Account Id:</strong>
+    <div>
+        <strong>N°:</strong>
         {{ $account->account_id }}
     </div>
-    <div class="form-group">
-        <strong>Avail Balance:</strong>
+    <div>
+        <strong>Availiable Balance:</strong>
         {{ $account->avail_balance }}
     </div>
-    <div class="form-group">
+    <div>
         <strong>Close Date:</strong>
         {{ $account->close_date }}
     </div>
-    <div class="form-group">
+    <div>
         <strong>Last Activity Date:</strong>
         {{ $account->last_activity_date }}
     </div>
-    <div class="form-group">
+    <div>
         <strong>Open Date:</strong>
         {{ $account->open_date }}
     </div>
-    <div class="form-group">
+    <div>
         <strong>Pending Balance:</strong>
         {{ $account->pending_balance }}
     </div>
-    <div class="form-group">
+    <div>
         <strong>Status:</strong>
         {{ $account->status }}
     </div>
-    <div class="form-group">
-        <strong>Cust Id:</strong>
-        {{ $account->cust_id }}
+    <div>
+        <strong>Customer:</strong>
+        @switch($account->customer->cust_type_cd)
+            @case("i")
+                {{ $account->customer->individual->first_name . ' ' . $account->customer->individual->last_name }}
+                @break
+            @case("b")
+                {{ $account->customer->business->name }}
+                @break
+            @default "None"
+        @endswitch
     </div>
-    <div class="form-group">
-        <strong>Open Branch Id:</strong>
-        {{ $account->open_branch_id }}
+    <div>
+        <strong>Customer Type:</strong>
+        @switch($account->customer->cust_type_cd)
+            @case("i")
+                Individual
+                @break
+            @case("b")
+                Business
+                @break
+            @default "None"
+        @endswitch
     </div>
-    <div class="form-group">
-        <strong>Open Emp Id:</strong>
-        {{ $account->open_emp_id }}
+    <div>
+        <strong>Open Branch:</strong>
+        {{ $account->branch->name }}
     </div>
-    <div class="form-group">
-        <strong>Product Cd:</strong>
-        {{ $account->product_cd }}
+    <div>
+        <strong>Open Empployee:</strong>
+        {{ $account->employee->first_name . ' ' . $account->employee->last_name }}
+    </div>
+    <div>
+        <strong>Product:</strong>
+        {{ $account->product->name }}
     </div>
 @endsection

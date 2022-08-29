@@ -1,7 +1,9 @@
 @extends('layouts.app-master')
 
-@section('title', "Edit")
-@section('title_small', "Editez le record.")
+@section('title')
+    Edit Business : {{ $business->name; }}
+@endsection
+@section('title_small', "Editez le partenaire de type business.")
 
 @section('content')
     @include('layouts.partials.errors')

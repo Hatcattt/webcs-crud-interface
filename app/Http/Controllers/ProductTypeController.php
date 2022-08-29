@@ -17,6 +17,15 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  */
 class ProductTypeController extends Controller
 {
+
+    /**
+     *  Middleware to ensure that a user who have "reader" role, can only see index() and show() methods.
+     */
+    public function __construct()
+    {
+        $this->middleware(['auth', 'role:admin'], ['except' => ['show', 'index']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -24,9 +33,8 @@ class ProductTypeController extends Controller
      */
     public function index()
     {
-        $product_types = ProductType::get();
-        $columns = Schema::getColumnListing('product_type');
-        return view('crud.product-type.index', compact('product_types', 'columns'));
+        $product_types = ProductType::paginate();
+        return view('crud.product-type.index', compact('product_types'));
     }
 
     /**
@@ -36,7 +44,6 @@ class ProductTypeController extends Controller
      */
     public function create()
     {
-        Abord::ifReader();
         $product_type = new ProductType();
         return view('crud.product-type.create', compact('product_type'));
     }
@@ -49,7 +56,6 @@ class ProductTypeController extends Controller
      */
     public function store(Request $request)
     {
-        Abord::ifReader();
         request()->validate(ProductType::$rules);
 
         try {
@@ -80,7 +86,6 @@ class ProductTypeController extends Controller
      */
     public function edit($id)
     {
-        Abord::ifReader();
         $product_type = ProductType::findOrFail($id);
         return view('crud.product-type.edit', compact('product_type'));
     }
@@ -94,7 +99,6 @@ class ProductTypeController extends Controller
      */
     public function update(Request $request, ProductType $productType)
     {
-        Abord::ifReader();
         request()->validate(ProductType::$rules);
 
         try {
@@ -112,7 +116,6 @@ class ProductTypeController extends Controller
      */
     public function destroy($id)
     {
-        Abord::ifReader();
         try {
             $product_type = ProductType::findOrFail($id)->delete();
         } catch (\Exception $e) {

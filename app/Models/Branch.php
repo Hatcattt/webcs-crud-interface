@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * Class Branch
@@ -32,11 +33,22 @@ class Branch extends Model
     public $timestamps = false;
 
     static $rules = [
-		'branch_id' => 'required',
-		'name' => 'required',
+        'address' => 'string|max:30|nullable',
+        'city' => 'string|max:20|nullable',
+		'name' => 'required|string|max:20',
+        'state' => 'string|max:10|nullable',
+        'zip_code' => 'string|max:10|nullable|regex:^\d+$^',
     ];
 
-    protected $perPage = 20;
+    /**
+     * @return Attribute city with ucfirst() method
+     */
+    protected function city(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => ucfirst($value),
+        );
+    }
 
     /**
      * Attributes that should be mass-assignable.

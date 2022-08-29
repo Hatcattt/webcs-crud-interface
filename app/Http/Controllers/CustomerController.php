@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Custom\Abord\Abord;
-use App\Exports\CustomerExport;
+use App\Models\Account;
+use App\Models\Officer;
+use App\Models\Business;
 use App\Models\Customer;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Schema;
+use App\Exports\CustomerExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -16,6 +17,15 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  */
 class CustomerController extends Controller
 {
+
+    /**
+     *  Middleware to ensure that a user who have "reader" role, can only see index() and show() methods.
+     */
+    public function __construct()
+    {
+        $this->middleware(['auth', 'role:admin'], ['except' => ['show', 'index']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -23,9 +33,8 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        $customers = Customer::get();
-        $columns = Schema::getColumnListing('customer');
-        return view('crud.customer.index', compact('customers', 'columns'));
+        $customers = Customer::with('individual', 'business')->paginate();
+        return view('crud.customer.index', compact('customers'));
     }
 
     /**
@@ -35,7 +44,6 @@ class CustomerController extends Controller
      */
     public function create()
     {
-        Abord::ifReader();
         $customer = new Customer();
         return view('crud.customer.create', compact('customer'));
     }
@@ -48,16 +56,26 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
-        Abord::ifReader();
         request()->validate(Customer::$rules);
 
         try {
             $customer = Customer::create($request->all());
+
+            switch($customer->cust_type_cd) {
+                case("i"):
+                    return redirect()->route('individual.create')->with([ 'cust_id' => $customer->cust_id ]);
+                    break;
+                case("b"):
+                    return redirect()->route('business.create')->with([ 'cust_id' => $customer->cust_id ]);
+                    break;
+                default:
+                    return redirect()->back()->with('error', 'Unable to execute this action.');
+            }
+
         } catch (\Exception $e) {
-            return redirect()->route('customer.index')->with('error', 'Error : Unable to execute this action !');
+            return redirect()->back()->with('error', 'Error : Unable to execute this action !');
         }
-        return redirect()->route('customer.index')
-            ->with('success', 'Customer created successfully.');
+        return redirect()->route('customer.index')->with('success', 'Customer created successfully.');
     }
 
     /**
@@ -69,7 +87,14 @@ class CustomerController extends Controller
     public function show($id)
     {
         $customer = Customer::findOrFail($id);
-
+        switch($customer->cust_type_cd) {
+            case('i'):
+                if ($customer->individual == null) return redirect()->back()->with('error', 'This individual customer is not fully created yet.');
+                break;
+            case('b'):
+                if ($customer->business == null) return redirect()->back()->with('error', 'This business customer is not fully created yet.');
+                break;
+        }
         return view('crud.customer.show', compact('customer'));
     }
 
@@ -81,9 +106,15 @@ class CustomerController extends Controller
      */
     public function edit($id)
     {
-        Abord::ifReader();
         $customer = Customer::findOrFail($id);
-
+        switch($customer->cust_type_cd) {
+            case('i'):
+                if ($customer->individual == null) return redirect()->back()->with('error', 'This individual customer must be created before edited.');
+                break;
+            case('b'):
+                if ($customer->business == null) return redirect()->back()->with('error', 'This business customer must be created before edited.');
+                break;
+        }
         return view('crud.customer.edit', compact('customer'));
     }
 
@@ -96,17 +127,23 @@ class CustomerController extends Controller
      */
     public function update(Request $request, Customer $customer)
     {
-        Abord::ifReader();
         request()->validate(Customer::$rules);
+        if($request->input('choice') == "yes") {
 
-        try {
+            switch($customer->cust_type_cd) {
+                case('i'):
+                    $customer->update($request->all());
+                    return redirect(route('individual.edit', $customer->cust_id));
+                    break;
+                case('b'):
+                    $customer->update($request->all());
+                    return redirect(route('business.edit', $customer->cust_id));
+                    break;
+                }
+        } else {
             $customer->update($request->all());
-        } catch (\Exception $e) {
-            return redirect()->route('customer.index')->with('error', 'Error : Unable to execute this action !');
+            return redirect()->route('customer.index')->with('success', 'Customer updated successfully');
         }
-
-        return redirect()->route('customer.index')
-            ->with('success', 'Customer updated successfully');
     }
 
     /**
@@ -116,14 +153,44 @@ class CustomerController extends Controller
      */
     public function destroy($id)
     {
-        Abord::ifReader();
-        try {
-            $customer = Customer::find($id)->delete();
-        } catch (\Exception $e) {
-            return redirect()->route('customer.index')->with('error', 'Error : Unable to execute this action !');
-        }
-        return redirect()->route('customer.index')
-            ->with('success', 'Customer deleted successfully');
+        $customer = Customer::find($id);
+        $business = Business::find($customer->cust_id);
+
+        switch($customer->cust_type_cd) {
+            case('i'):
+                if (Account::where('cust_id', '=', $customer->cust_id)->exists()) {
+                    return redirect()->back()->with('error', 'Error : Ce client individuel ne peut pas être supprimé directement, il possède des comptes ou des transactions bancaires.');
+
+                 } elseif($customer->individual != null) {
+                    $customer->individual->delete();
+                    $customer->delete();
+                 }
+                 $customer->delete();
+                break;
+
+            case('b'):
+                if($business == null) {
+                    $customer->delete();
+                    return redirect()->back()->with('success', 'Customer deleted successfully');
+                }
+
+                $officer = Officer::where('cust_id', '=', $business->cust_id )->first();
+                if ($officer == null) {
+                    $customer->business->delete();
+                    $customer->delete();
+                    return redirect()->back()->with('success', 'Customer deleted successfully');
+                }
+                
+                if (Account::where('cust_id', '=', $business->cust_id)->exists()) {
+                    return redirect()->back()->with('error', 'Error : Ce client de type business ne peut pas être supprimé directement, il possède des comptes ou des transactions bancaires.');
+                 } else {
+                    $officer->delete();
+                    $customer->business->delete();
+                    $customer->delete();
+                }
+                break;
+            }
+        return redirect()->back()->with('success', 'Customer deleted successfully');
     }
 
     /**
@@ -134,4 +201,5 @@ class CustomerController extends Controller
     {
         return Excel::download(new CustomerExport, 'customers.xlsx');
     }
+
 }

@@ -3,13 +3,25 @@
         <li class="fa-solid fa-cog fa-spin fa-xl" style="--fa-animation-duration: 6s;"></li>
         <li><a href="./" class="contrast" title="@lang('Home')"><strong>Crud-Project</strong></a></li>
         @auth
-            <li><a href="{{ route('crud.index') }}" class="outline" title="@lang('CRUD Interface')">
-                    <span class="fa-solid fa-gears"></span> Interface</a></li>
+            <li>
+                <a href="{{ route('crud.index') }}" class="outline" title="Manage your organisation">
+                    <span class="fa-solid fa-gears"></span> Manage
+                </a>
+            </li>
 
             @if (Auth::user()->role === 'admin')
-                <li><a href="{{ route('export.index') }}" class="outline" title="@lang('Export to Excel')">
-                        <span class="fa-solid fa-file-export"></span> Export</a></li>
+                <li>
+                    <a href="{{ route('export.index') }}" class="outline" title="@lang('Export to Excel')">
+                        <span class="fa-solid fa-file-export"></span> Export
+                    </a>
+                </li>
             @endif
+
+            <li style="padding-left: 20px; font-size: 17px;">You are connect 
+                <a class="users-edit-nav" href={{ Auth::user()->role === 'admin' ? route('users.index') : route('users.edit', Auth::user()) }}>
+                    <strong>{{ Auth::user()->username }}</strong>
+                </a>
+            </li>
         @endauth
     </ul>
     <ul>
@@ -25,21 +37,9 @@
             </details>
         </li>
         @auth
-        <li>
-            <details role="list" dir="rtl">
-                <summary title="@lang('Parameters')" aria-haspopup="listbox" role="link" class="contrast"><span
-                        style="margin: auto" class="fa-solid fa-gear"></span></summary>
-                <ul role="listbox">
-                    <li><a title="@lang('Log Out')" class="fa-solid fa-power-off"
-                           href="{{ route('logout.perform') }}"></a></li>
-
-                    @if (Auth::user()->role === 'admin')
-                        <li><a title="@lang('Administration')" class="fa-solid fa-user-large secondary"
-                               href="{{ route('users.edit') }}"></a></li>
-                    @endif
-                </ul>
-            </details>
-        </li>
+            <li>
+                <a title="@lang('Log Out')" class="fa-solid fa-power-off" href="{{ route('logout.perform') }}"></a>
+            </li>
         @endauth
 
         @guest

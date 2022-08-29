@@ -16,6 +16,15 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  */
 class DepartmentController extends Controller
 {
+
+    /**
+     *  Middleware to ensure that a user who have "reader" role, can only see index() and show() methods.
+     */
+    public function __construct()
+    {
+        $this->middleware(['auth', 'role:admin'], ['except' => ['show', 'index']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -23,9 +32,8 @@ class DepartmentController extends Controller
      */
     public function index()
     {
-        $departments = Department::get();
-        $columns = Schema::getColumnListing('department');
-        return view('crud.department.index', compact('departments', 'columns'));
+        $departments = Department::paginate();
+        return view('crud.department.index', compact('departments'));
     }
 
     /**
@@ -35,7 +43,6 @@ class DepartmentController extends Controller
      */
     public function create()
     {
-        Abord::ifReader();
         $department = new Department();
         return view('crud.department.create', compact('department'));
     }
@@ -48,7 +55,6 @@ class DepartmentController extends Controller
      */
     public function store(Request $request)
     {
-        Abord::ifReader();
         request()->validate(Department::$rules);
 
         try {
@@ -76,7 +82,6 @@ class DepartmentController extends Controller
      */
     public function edit($id)
     {
-        Abord::ifReader();
         $department = Department::findOrFail($id);
 
         return view('crud.department.edit', compact('department'));
@@ -91,7 +96,6 @@ class DepartmentController extends Controller
      */
     public function update(Request $request, Department $department)
     {
-        Abord::ifReader();
         request()->validate(Department::$rules);
 
         try {
@@ -110,14 +114,13 @@ class DepartmentController extends Controller
      */
     public function destroy($id)
     {
-        Abord::ifReader();
         try {
             $department = Department::findOrFail($id)->delete();
         } catch (\Exception $e) {
             return redirect()->route('department.index')->with('error', 'Error : Unable to execute this action !');
         }
 
-        return redirect()->route('departments.index')
+        return redirect()->route('department.index')
             ->with('success', 'Department deleted successfully');
     }
 

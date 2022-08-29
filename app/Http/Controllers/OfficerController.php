@@ -16,6 +16,15 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  */
 class OfficerController extends Controller
 {
+
+    /**
+     *  Middleware to ensure that a user who have "reader" role, can only see index() and show() methods.
+     */
+    public function __construct()
+    {
+        $this->middleware(['auth', 'role:admin'], ['except' => ['show', 'index']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -23,9 +32,8 @@ class OfficerController extends Controller
      */
     public function index()
     {
-        $officers = Officer::get();
-        $columns = Schema::getColumnListing('officer');
-        return view('crud.officer.index', compact('officers', 'columns'));
+        $officers = Officer::with('customer')->paginate();
+        return view('crud.officer.index', compact('officers'));
     }
 
     /**
@@ -35,9 +43,12 @@ class OfficerController extends Controller
      */
     public function create()
     {
-        Abord::ifReader();
         $officer = new Officer();
-        return view('crud.officer.create', compact('officer'));
+
+        session()->keep('cust_id');
+        $cust_id = session()->get('cust_id');
+
+        return view('crud.officer.create', compact('officer', 'cust_id'));
     }
 
     /**
@@ -48,7 +59,6 @@ class OfficerController extends Controller
      */
     public function store(Request $request)
     {
-        Abord::ifReader();
         request()->validate(Officer::$rules);
 
         try {
@@ -57,8 +67,8 @@ class OfficerController extends Controller
             return redirect()->route('officer.index')->with('error', 'Error : Unable to execute this action !');
         }
 
-        return redirect()->route('officer.index')
-            ->with('success', 'Officer created successfully.');
+        return redirect()->route('business.index')
+            ->with('success', 'Business officer customer created successfully.');
     }
 
     /**
@@ -79,7 +89,6 @@ class OfficerController extends Controller
      */
     public function edit($id)
     {
-        Abord::ifReader();
         $officer = Officer::findOrFail($id);
 
         return view('crud.officer.edit', compact('officer'));
@@ -94,7 +103,6 @@ class OfficerController extends Controller
      */
     public function update(Request $request, Officer $officer)
     {
-        Abord::ifReader();
         request()->validate(Officer::$rules);
 
         try {
@@ -103,7 +111,7 @@ class OfficerController extends Controller
             return redirect()->route('officer.index')->with('error', 'Error : Unable to execute this action !');
         }
         return redirect()->route('officer.index')
-            ->with('success', 'Officer updated successfully');
+            ->with('success', 'Business officer customer updated successfully');
     }
 
     /**
@@ -112,7 +120,6 @@ class OfficerController extends Controller
      */
     public function destroy($id)
     {
-        Abord::ifReader();
         try {
             $officer = Officer::findOrFail($id)->delete();
         } catch (\Exception $e) {

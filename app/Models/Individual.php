@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 /**
  * Class Individual
@@ -23,12 +24,12 @@ class Individual extends Model
     public $timestamps = false;
 
     static $rules = [
+        'birth_date' => 'date|nullable',
 		'first_name' => 'required',
 		'last_name' => 'required',
-		'cust_id' => 'required',
     ];
 
-    protected $perPage = 20;
+    protected $perPage = 10;
 
     /**
      * Attributes that should be mass-assignable.
@@ -36,6 +37,31 @@ class Individual extends Model
      * @var array
      */
     protected $fillable = ['birth_date','first_name','last_name','cust_id'];
+    
+    public function getFullNameAttribute()
+    {
+            return ucwords("{$this->first_name} {$this->last_name}");
+    }
+
+    /**
+     * @return Attribute first name with ucfirst() method
+     */
+    protected function firstName(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => ucfirst($value),
+        );
+    }
+
+    /**
+     * @return Attribute last name with ucfirst() method
+     */
+    protected function lastName(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => ucfirst($value),
+        );
+    }
 
     /**
      * @return array
@@ -52,6 +78,5 @@ class Individual extends Model
     {
         return $this->hasOne('App\Models\Customer', 'cust_id', 'cust_id');
     }
-
 
 }

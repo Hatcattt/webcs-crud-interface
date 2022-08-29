@@ -21,11 +21,10 @@ class Department extends Model
     public $timestamps = false;
 
     static $rules = [
-		'dept_id' => 'required',
-		'name' => 'required',
+		'name' => 'required|string|max:20|unique:department,name',
     ];
 
-    protected $perPage = 20;
+    protected $perPage = 10;
 
     /**
      * Attributes that should be mass-assignable.

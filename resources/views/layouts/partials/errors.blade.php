@@ -7,18 +7,3 @@
         </ul>
     </div>
 @endif
-
-{{--@if(Session::get('success', false))--}}
-{{--    <?php $data = Session::get('success'); ?>--}}
-{{--    @if (is_array($data))--}}
-{{--        @foreach ($data as $msg)--}}
-{{--            <div>--}}
-{{--                {{ $msg }}--}}
-{{--            </div>--}}
-{{--        @endforeach--}}
-{{--    @else--}}
-{{--        <div>--}}
-{{--            {{ $data }}--}}
-{{--        </div>--}}
-{{--    @endif--}}
-{{--@endif--}}

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,8 +34,9 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         include('crud-routing.php');
     });
 
-    Route::middleware(['auth', 'role:admin'])->group(function () {
-        Route::get('/users', 'UserController@edit')->name('users.edit');
+    Route::middleware(['auth', 'auth'])->group(function () {
+        Route::resource('/users', UserController::class);
+        
         include('export-routing.php');
     });
 });

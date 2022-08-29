@@ -1,41 +1,52 @@
 @extends('layouts.app-master')
 
-@section('title', "Show")
-@section('title_small', "Voici l'aperçu de votre record.")
+@section('title')
+    Account Transaction N° {{ $acc_transaction->txn_id }}
+@endsection
+@section('title_small', "Voici l'aperçu de la transaction bancaire.")
 
 @section('content')
-    <a title="Get back" role="button" href="{{ route('acc-transaction.index') }}"> BACK</a>
+    <div class="btn-back">
+        <a title="Get back" role="button" href="{{ url()->previous() }}"> BACK</a>
+    </div>
 
-    <div class="form-group">
-        <strong>Txn Id:</strong>
+    <div>
+        <strong>Transaction N°:</strong>
         {{ $acc_transaction->txn_id }}
     </div>
-    <div class="form-group">
+    <div>
         <strong>Amount:</strong>
         {{ $acc_transaction->amount }}
     </div>
-    <div class="form-group">
-        <strong>Funds Avail Date:</strong>
+    <div>
+        <strong>Funds Available Date:</strong>
         {{ $acc_transaction->funds_avail_date }}
     </div>
-    <div class="form-group">
-        <strong>Txn Date:</strong>
+    <div>
+        <strong>Transaction Date:</strong>
         {{ $acc_transaction->txn_date }}
     </div>
-    <div class="form-group">
-        <strong>Txn Type Cd:</strong>
+    <div>
+        <strong>Transaction Type:</strong>
         {{ $acc_transaction->txn_type_cd }}
     </div>
-    <div class="form-group">
-        <strong>Account Id:</strong>
-        {{ $acc_transaction->account_id }}
+    <div>
+        <strong>Account:</strong>
+        @switch($acc_transaction->account->customer->cust_type_cd)
+            @case('i')
+                <strong>{{ $acc_transaction->account->customer->individual->full_name }}</strong> : Individual
+                @break
+            @case('b')
+                <strong>{{ $acc_transaction->account->customer->business->name }}</strong> : Business
+                @break
+        @endswitch
     </div>
-    <div class="form-group">
-        <strong>Execution Branch Id:</strong>
-        {{ $acc_transaction->execution_branch_id }}
+    <div>
+        <strong>Execution Branch:</strong>
+        {{ $acc_transaction->branch == null ? 'Not defined' : $acc_transaction->branch->name }}
     </div>
-    <div class="form-group">
-        <strong>Teller Emp Id:</strong>
-        {{ $acc_transaction->teller_emp_id }}
+    <div>
+        <strong>Teller Employee:</strong>
+        {{ $acc_transaction->employee == null ? 'Not defined' : $acc_transaction->employee->full_name }}
     </div>
 @endsection
